@@ -15,7 +15,7 @@ import platforms.platform
 class Platform(platforms.local.Platform):
     @property
     def device_str(self):
-        return 'cpu'
+        return "cpu"
 
     @property
     def is_parallel(self):
@@ -23,7 +23,7 @@ class Platform(platforms.local.Platform):
 
     @property
     def root(self):
-        return os.path.join(super(Platform, self).root, 'TESTING')
+        return os.path.join(super(Platform, self).root, "TESTING")
 
 
 class TestCase(unittest.TestCase):
@@ -36,14 +36,17 @@ class TestCase(unittest.TestCase):
         self.root = platforms.platform.get_platform().root
 
     def tearDown(self):
-        if os.path.exists(self.root): shutil.rmtree(self.root)
+        if os.path.exists(self.root):
+            shutil.rmtree(self.root)
         platforms.platform._PLATFORM = self.saved_platform
 
     @staticmethod
     def get_state(model):
         """Get a copy of the state of a model."""
 
-        return {k: v.clone().detach().cpu().numpy() for k, v in model.state_dict().items()}
+        return {
+            k: v.clone().detach().cpu().numpy() for k, v in model.state_dict().items()
+        }
 
     def assertStateEqual(self, state1, state2):
         """Assert that two models states are equal."""
@@ -61,5 +64,5 @@ class TestCase(unittest.TestCase):
 
 
 def main():
-    if __name__ == '__main__':
+    if __name__ == "__main__":
         unittest.main()

@@ -17,7 +17,8 @@ def make_BranchDesc(BranchHparams: type, name: str):
         branch_hparams: BranchHparams
 
         @staticmethod
-        def name_prefix(): return 'lottery_branch_' + name
+        def name_prefix():
+            return "lottery_branch_" + name
 
         @staticmethod
         def add_args(parser: argparse.ArgumentParser, defaults: LotteryDesc = None):
@@ -26,6 +27,8 @@ def make_BranchDesc(BranchHparams: type, name: str):
 
         @classmethod
         def create_from_args(cls, args: argparse.Namespace):
-            return BranchDesc(LotteryDesc.create_from_args(args), BranchHparams.create_from_args(args))
+            return BranchDesc(
+                LotteryDesc.create_from_args(args), BranchHparams.create_from_args(args)
+            )
 
     return BranchDesc

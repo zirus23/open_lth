@@ -13,7 +13,7 @@ from testing import test_case
 class TestRegistry(test_case.TestCase):
     def setUp(self):
         super(TestRegistry, self).setUp()
-        self.dataset_hparams = hparams.DatasetHparams('cifar10', 50)
+        self.dataset_hparams = hparams.DatasetHparams("cifar10", 50)
 
     def test_get(self):
         loader = registry.get(self.dataset_hparams, train=True)
@@ -58,7 +58,7 @@ class TestRegistry(test_case.TestCase):
 
     def test_get_unsupervised_labels(self):
         self.dataset_hparams.transformation_seed = 0
-        self.dataset_hparams.unsupervised_labels = 'rotation'
+        self.dataset_hparams.unsupervised_labels = "rotation"
         loader = registry.get(self.dataset_hparams, train=True)
         self.assertIsInstance(loader, base.DataLoader)
         self.assertEqual(len(loader), 1000)

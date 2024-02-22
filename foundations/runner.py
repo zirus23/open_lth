@@ -26,7 +26,7 @@ class Runner(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def create_from_args(args: argparse.Namespace) -> 'Runner':
+    def create_from_args(args: argparse.Namespace) -> "Runner":
         """Create a runner from command line arguments."""
 
         pass

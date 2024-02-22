@@ -39,36 +39,40 @@ class TestPrunedModel(test_case.TestCase):
 
     def test_with_missing_mask_value(self):
         mask = Mask.ones_like(self.model)
-        del mask['layer.weight']
+        del mask["layer.weight"]
 
         with self.assertRaises(ValueError):
             PrunedModel(self.model, mask)
 
     def test_with_excess_mask_value(self):
         mask = Mask.ones_like(self.model)
-        mask['layer2.weight'] = np.ones(20)
+        mask["layer2.weight"] = np.ones(20)
 
         with self.assertRaises(ValueError):
             PrunedModel(self.model, mask)
 
     def test_with_incorrect_shape(self):
         mask = Mask.ones_like(self.model)
-        mask['layer.weight'] = np.ones(30)
+        mask["layer.weight"] = np.ones(30)
 
         with self.assertRaises(ValueError):
             PrunedModel(self.model, mask)
 
     def test_with_mask(self):
         mask = Mask()
-        mask['layer.weight'] = np.array([1, 0, 1, 0, 1, 0, 1, 0, 1, 0])
+        mask["layer.weight"] = np.array([1, 0, 1, 0, 1, 0, 1, 0, 1, 0])
         pruned_model = PrunedModel(self.model, mask)
 
         # Check that the forward pass gives the correct value.
         self.assertEqual(20.0, pruned_model(self.example).item())
 
         # Check that the appropriate weights have been zeroed out.
-        self.assertTrue(np.array_equal(self.model.state_dict()['layer.weight'].numpy(),
-                                       np.array([0, 0, 2, 0, 4, 0, 6, 0, 8, 0])))
+        self.assertTrue(
+            np.array_equal(
+                self.model.state_dict()["layer.weight"].numpy(),
+                np.array([0, 0, 2, 0, 4, 0, 6, 0, 8, 0]),
+            )
+        )
 
         # Perform a backward pass.
         self.optimizer.zero_grad()
@@ -77,8 +81,12 @@ class TestPrunedModel(test_case.TestCase):
         self.assertEqual(22.0, pruned_model(self.example).item())
 
         # Verify the weights.
-        self.assertTrue(np.allclose(self.model.state_dict()['layer.weight'].numpy(),
-                                    np.array([0.4, 0, 2.4, 0, 4.4, 0, 6.4, 0, 8.4, 0])))
+        self.assertTrue(
+            np.allclose(
+                self.model.state_dict()["layer.weight"].numpy(),
+                np.array([0.4, 0, 2.4, 0, 4.4, 0, 6.4, 0, 8.4, 0]),
+            )
+        )
 
     def test_save(self):
         state1 = self.get_state(self.model)
@@ -97,11 +105,13 @@ class TestPrunedModel(test_case.TestCase):
         pruned_model = PrunedModel(self.model, mask)
 
         state_dict = pruned_model.state_dict()
-        self.assertEqual(set(['model.layer.weight', 'mask_layer___weight']), state_dict.keys())
+        self.assertEqual(
+            set(["model.layer.weight", "mask_layer___weight"]), state_dict.keys()
+        )
 
     def test_load_state_dict(self):
         mask = Mask.ones_like(self.model)
-        mask['layer.weight'] = np.array([1, 0, 1, 0, 1, 0, 1, 0, 1, 0])
+        mask["layer.weight"] = np.array([1, 0, 1, 0, 1, 0, 1, 0, 1, 0])
         self.model.layer.weight.data = torch.arange(10, 20, dtype=torch.float32)
         pruned_model = PrunedModel(self.model, mask)
         self.assertEqual(70.0, pruned_model(self.example).item())

@@ -32,29 +32,39 @@ class Desc(abc.ABC):
         """The name under which experiments with these hyperparameters will be stored."""
 
         fields_dict = {f.name: getattr(self, f.name) for f in fields(self)}
-        hparams_strs = [str(fields_dict[k]) for k in sorted(fields_dict) if isinstance(fields_dict[k], Hparams)]
-        hash_str = hashlib.md5(';'.join(hparams_strs).encode('utf-8')).hexdigest()
-        return f'{self.name_prefix()}_{hash_str}'
+        hparams_strs = [
+            str(fields_dict[k])
+            for k in sorted(fields_dict)
+            if isinstance(fields_dict[k], Hparams)
+        ]
+        hash_str = hashlib.md5(";".join(hparams_strs).encode("utf-8")).hexdigest()
+        return f"{self.name_prefix()}_{hash_str}"
 
     @staticmethod
     @abc.abstractmethod
-    def add_args(parser: argparse.ArgumentParser, defaults: 'Desc' = None) -> None:
+    def add_args(parser: argparse.ArgumentParser, defaults: "Desc" = None) -> None:
         """Add the necessary command-line arguments."""
 
         pass
 
     @staticmethod
     @abc.abstractmethod
-    def create_from_args(args: argparse.Namespace) -> 'Desc':
+    def create_from_args(args: argparse.Namespace) -> "Desc":
         """Create from command line arguments."""
 
         pass
 
     def save(self, output_location):
-        if not get_platform().is_primary_process: return
-        if not get_platform().exists(output_location): get_platform().makedirs(output_location)
+        if not get_platform().is_primary_process:
+            return
+        if not get_platform().exists(output_location):
+            get_platform().makedirs(output_location)
 
         fields_dict = {f.name: getattr(self, f.name) for f in fields(self)}
-        hparams_strs = [fields_dict[k].display for k in sorted(fields_dict) if isinstance(fields_dict[k], Hparams)]
-        with get_platform().open(paths.hparams(output_location), 'w') as fp:
-            fp.write('\n'.join(hparams_strs))
+        hparams_strs = [
+            fields_dict[k].display
+            for k in sorted(fields_dict)
+            if isinstance(fields_dict[k], Hparams)
+        ]
+        with get_platform().open(paths.hparams(output_location), "w") as fp:
+            fp.write("\n".join(hparams_strs))

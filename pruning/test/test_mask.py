@@ -20,57 +20,59 @@ class TestMask(test_case.TestCase):
         self.assertEqual(len(m.keys()), 0)
         self.assertEqual(len(m.values()), 0)
 
-        m['hello'] = np.ones([2, 3])
-        m['world'] = np.zeros([5, 6])
+        m["hello"] = np.ones([2, 3])
+        m["world"] = np.zeros([5, 6])
         self.assertEqual(len(m), 2)
         self.assertEqual(len(m.keys()), 2)
         self.assertEqual(len(m.values()), 2)
-        self.assertEqual(set(m.keys()), set(['hello', 'world']))
-        self.assertTrue(np.array_equal(np.ones([2, 3]), m['hello']))
-        self.assertTrue(np.array_equal(np.zeros([5, 6]), m['world']))
+        self.assertEqual(set(m.keys()), set(["hello", "world"]))
+        self.assertTrue(np.array_equal(np.ones([2, 3]), m["hello"]))
+        self.assertTrue(np.array_equal(np.zeros([5, 6]), m["world"]))
 
-        del m['hello']
+        del m["hello"]
         self.assertEqual(len(m), 1)
         self.assertEqual(len(m.keys()), 1)
         self.assertEqual(len(m.values()), 1)
-        self.assertEqual(set(m.keys()), set(['world']))
-        self.assertTrue(np.array_equal(np.zeros([5, 6]), m['world']))
+        self.assertEqual(set(m.keys()), set(["world"]))
+        self.assertTrue(np.array_equal(np.zeros([5, 6]), m["world"]))
 
     def test_create_mask_from_dict(self):
-        m = Mask({'hello': np.ones([2, 3]), 'world': np.zeros([5, 6])})
+        m = Mask({"hello": np.ones([2, 3]), "world": np.zeros([5, 6])})
         self.assertEqual(len(m), 2)
         self.assertEqual(len(m.keys()), 2)
         self.assertEqual(len(m.values()), 2)
-        self.assertEqual(set(m.keys()), set(['hello', 'world']))
-        self.assertTrue(np.array_equal(np.ones([2, 3]), m['hello']))
-        self.assertTrue(np.array_equal(np.zeros([5, 6]), m['world']))
+        self.assertEqual(set(m.keys()), set(["hello", "world"]))
+        self.assertTrue(np.array_equal(np.ones([2, 3]), m["hello"]))
+        self.assertTrue(np.array_equal(np.zeros([5, 6]), m["world"]))
 
     def test_create_from_tensor(self):
-        m = Mask({'hello': torch.ones([2, 3]), 'world': torch.zeros([5, 6])})
+        m = Mask({"hello": torch.ones([2, 3]), "world": torch.zeros([5, 6])})
         self.assertEqual(len(m), 2)
         self.assertEqual(len(m.keys()), 2)
         self.assertEqual(len(m.values()), 2)
-        self.assertEqual(set(m.keys()), set(['hello', 'world']))
-        self.assertTrue(np.array_equal(np.ones([2, 3]), m['hello']))
-        self.assertTrue(np.array_equal(np.zeros([5, 6]), m['world']))
+        self.assertEqual(set(m.keys()), set(["hello", "world"]))
+        self.assertTrue(np.array_equal(np.ones([2, 3]), m["hello"]))
+        self.assertTrue(np.array_equal(np.zeros([5, 6]), m["world"]))
 
     def test_bad_inputs(self):
         m = Mask()
 
         with self.assertRaises(ValueError):
-            m[''] = np.ones([2, 3])
+            m[""] = np.ones([2, 3])
 
         with self.assertRaises(ValueError):
             m[6] = np.ones([2, 3])
 
         with self.assertRaises(ValueError):
-            m['hello'] = [[0, 1], [1, 0]]
+            m["hello"] = [[0, 1], [1, 0]]
 
         with self.assertRaises(ValueError):
-            m['hello'] = np.array([[0, 1], [2, 0]])
+            m["hello"] = np.array([[0, 1], [2, 0]])
 
     def test_ones_like(self):
-        model = models.registry.get(models.registry.get_default_hparams('cifar_resnet_20').model_hparams)
+        model = models.registry.get(
+            models.registry.get_default_hparams("cifar_resnet_20").model_hparams
+        )
         m = Mask.ones_like(model)
 
         for k, v in model.state_dict().items():
@@ -85,7 +87,7 @@ class TestMask(test_case.TestCase):
         self.assertFalse(Mask.exists(self.root))
         self.assertFalse(os.path.exists(paths.mask(self.root)))
 
-        m = Mask({'hello': np.ones([2, 3]), 'world': np.zeros([5, 6])})
+        m = Mask({"hello": np.ones([2, 3]), "world": np.zeros([5, 6])})
         m.save(self.root)
         self.assertTrue(os.path.exists(paths.mask(self.root)))
         self.assertTrue(Mask.exists(self.root))
@@ -94,9 +96,9 @@ class TestMask(test_case.TestCase):
         self.assertEqual(len(m2), 2)
         self.assertEqual(len(m2.keys()), 2)
         self.assertEqual(len(m2.values()), 2)
-        self.assertEqual(set(m2.keys()), set(['hello', 'world']))
-        self.assertTrue(np.array_equal(np.ones([2, 3]), m2['hello']))
-        self.assertTrue(np.array_equal(np.zeros([5, 6]), m2['world']))
+        self.assertEqual(set(m2.keys()), set(["hello", "world"]))
+        self.assertTrue(np.array_equal(np.ones([2, 3]), m2["hello"]))
+        self.assertTrue(np.array_equal(np.zeros([5, 6]), m2["world"]))
 
 
 test_case.main()

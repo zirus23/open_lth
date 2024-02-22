@@ -26,21 +26,29 @@ class BranchRunner(Runner):
     def add_args(parser):
         # Produce help text for selecting the branch.
         branch_names = sorted(registry.registered_branches.keys())
-        helptext = '='*82 + '\nOpenLTH: A Library for Research on Lottery Tickets and Beyond\n' + '-'*82
-        helptext += '\nChoose a branch to run:'
+        helptext = (
+            "=" * 82
+            + "\nOpenLTH: A Library for Research on Lottery Tickets and Beyond\n"
+            + "-" * 82
+        )
+        helptext += "\nChoose a branch to run:"
         for branch_name in branch_names:
             helptext += "\n    * {} {} {} [...] => {}".format(
-                        sys.argv[0], sys.argv[1], branch_name, registry.get(branch_name).description())
-        helptext += '\n' + '='*82
+                sys.argv[0],
+                sys.argv[1],
+                branch_name,
+                registry.get(branch_name).description(),
+            )
+        helptext += "\n" + "=" * 82
 
         # Print an error message if appropriate.
-        branch_name = arg_utils.maybe_get_arg('subcommand', positional=True, position=1)
+        branch_name = arg_utils.maybe_get_arg("subcommand", positional=True, position=1)
         if branch_name not in branch_names:
             print(helptext)
             sys.exit(1)
 
         # Add the arguments for the branch.
-        parser.add_argument('branch_name', type=str)
+        parser.add_argument("branch_name", type=str)
         registry.get(branch_name).add_args(parser)
 
     @staticmethod

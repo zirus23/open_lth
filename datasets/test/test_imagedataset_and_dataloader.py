@@ -23,7 +23,8 @@ class TestImageDatasetAndDataLoader(test_case.TestCase):
             actual_labels += labels.tolist()
 
             i += 1
-            if i > minibatches: break
+            if i > minibatches:
+                break
 
         return actual_labels
 
@@ -32,13 +33,16 @@ class TestImageDatasetAndDataLoader(test_case.TestCase):
         self.assertIsNotNone(loader)
         self.assertEqual(len(loader), 12500)
 
-        if shuffle_seed is not None: loader.shuffle(shuffle_seed)
+        if shuffle_seed is not None:
+            loader.shuffle(shuffle_seed)
         return self.get_labels_from_loader(loader)
 
     def test_data_loading(self):
         train_set = cifar10.Dataset.get_train_set(use_augmentation=False)
         actual_labels = self.data_loading_helper(train_set)
-        self.assertEqual(actual_labels, train_set._labels[np.arange(len(actual_labels))].tolist())
+        self.assertEqual(
+            actual_labels, train_set._labels[np.arange(len(actual_labels))].tolist()
+        )
 
         train_set = cifar10.Dataset.get_train_set(use_augmentation=True)
         self.data_loading_helper(train_set)
@@ -70,7 +74,9 @@ class TestImageDatasetAndDataLoader(test_case.TestCase):
 
     def test_shuffling_dataloader_twice(self):
         train_set = cifar10.Dataset.get_train_set(use_augmentation=False)
-        loader = base.DataLoader(train_set, batch_size=4, num_workers=0, pin_memory=True)
+        loader = base.DataLoader(
+            train_set, batch_size=4, num_workers=0, pin_memory=True
+        )
 
         loader.shuffle(0)
         actual_seed0 = self.get_labels_from_loader(loader)
@@ -89,7 +95,9 @@ class TestImageDatasetAndDataLoader(test_case.TestCase):
         # Nothing should change about the labels.
         self.assertEqual(len(train_set), 50000)
         self.assertEqual(np.max(train_set._labels), 9)
-        self.assertEqual(train_set._labels[:10].tolist(), [6, 9, 9, 4, 1, 1, 2, 7, 8, 3])
+        self.assertEqual(
+            train_set._labels[:10].tolist(), [6, 9, 9, 4, 1, 1, 2, 7, 8, 3]
+        )
 
     def test_unsupervised_rotation(self):
         train_set = cifar10.Dataset.get_train_set(use_augmentation=True)
@@ -100,8 +108,10 @@ class TestImageDatasetAndDataLoader(test_case.TestCase):
         self.assertEqual(np.sum(train_set._labels == 1), 12629)
         self.assertEqual(np.sum(train_set._labels == 2), 12411)
         self.assertEqual(np.sum(train_set._labels == 3), 12421)
-        self.assertEqual(train_set._labels[:20].tolist(),
-                         [0, 3, 1, 0, 3, 3, 3, 3, 1, 3, 1, 2, 0, 3, 2, 0, 0, 0, 2, 1])
+        self.assertEqual(
+            train_set._labels[:20].tolist(),
+            [0, 3, 1, 0, 3, 3, 3, 3, 1, 3, 1, 2, 0, 3, 2, 0, 0, 0, 2, 1],
+        )
 
         train_set = cifar10.Dataset.get_train_set(use_augmentation=True)
         train_set.unsupervised_rotation(1)
@@ -111,8 +121,10 @@ class TestImageDatasetAndDataLoader(test_case.TestCase):
         self.assertEqual(np.sum(train_set._labels == 1), 12568)
         self.assertEqual(np.sum(train_set._labels == 2), 12433)
         self.assertEqual(np.sum(train_set._labels == 3), 12620)
-        self.assertEqual(train_set._labels[:20].tolist(),
-                         [1, 3, 0, 0, 3, 1, 3, 1, 3, 0, 0, 1, 0, 3, 1, 0, 2, 1, 2, 0])
+        self.assertEqual(
+            train_set._labels[:20].tolist(),
+            [1, 3, 0, 0, 3, 1, 3, 1, 3, 0, 0, 1, 0, 3, 1, 0, 2, 1, 2, 0],
+        )
 
 
 test_case.main()

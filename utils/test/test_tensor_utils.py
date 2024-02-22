@@ -12,29 +12,36 @@ from utils import tensor_utils
 class TestTensorUtils(test_case.TestCase):
     def test_vectorize(self):
         state_dict = {
-            'x': torch.arange(5),
-            'z': torch.arange(100, 105),
-            'y': torch.eye(3).long()
+            "x": torch.arange(5),
+            "z": torch.arange(100, 105),
+            "y": torch.eye(3).long(),
         }
         v = tensor_utils.vectorize(state_dict)
-        self.assertEqual(v.tolist(), [0, 1, 2, 3, 4, 1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 101, 102, 103, 104])
+        self.assertEqual(
+            v.tolist(),
+            [0, 1, 2, 3, 4, 1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 101, 102, 103, 104],
+        )
 
     def test_unvectorize(self):
         reference_state_dict = {
-            'x': torch.ones(5),
-            'z': torch.ones(5),
-            'y': torch.ones([3, 3]),
+            "x": torch.ones(5),
+            "z": torch.ones(5),
+            "y": torch.ones([3, 3]),
         }
-        v = torch.tensor([0, 1, 2, 3, 4, 1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 101, 102, 103, 104])
+        v = torch.tensor(
+            [0, 1, 2, 3, 4, 1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 101, 102, 103, 104]
+        )
         state_dict = tensor_utils.unvectorize(v, reference_state_dict)
 
         self.assertEqual(set(reference_state_dict.keys()), set(state_dict.keys()))
         for k in state_dict:
-            self.assertEqual(list(state_dict[k].shape), list(reference_state_dict[k].shape))
+            self.assertEqual(
+                list(state_dict[k].shape), list(reference_state_dict[k].shape)
+            )
 
-        self.assertEqual(state_dict['x'].tolist(), [0, 1, 2, 3, 4])
-        self.assertEqual(state_dict['z'].tolist(), [100, 101, 102, 103, 104])
-        self.assertEqual(state_dict['y'].tolist(), [[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+        self.assertEqual(state_dict["x"].tolist(), [0, 1, 2, 3, 4])
+        self.assertEqual(state_dict["z"].tolist(), [100, 101, 102, 103, 104])
+        self.assertEqual(state_dict["y"].tolist(), [[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
     def test_perm(self):
         p = tensor_utils.perm(10)

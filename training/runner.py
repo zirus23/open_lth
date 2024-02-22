@@ -31,19 +31,36 @@ class TrainingRunner(Runner):
         TrainingDesc.add_args(parser, shared_args.maybe_get_default_hparams())
 
     @staticmethod
-    def create_from_args(args: argparse.Namespace) -> 'TrainingRunner':
-        return TrainingRunner(args.replicate, TrainingDesc.create_from_args(args),
-                              not args.quiet, not args.evaluate_only_at_end)
+    def create_from_args(args: argparse.Namespace) -> "TrainingRunner":
+        return TrainingRunner(
+            args.replicate,
+            TrainingDesc.create_from_args(args),
+            not args.quiet,
+            not args.evaluate_only_at_end,
+        )
 
     def display_output_location(self):
         print(self.desc.run_path(self.replicate))
 
     def run(self):
         if self.verbose and get_platform().is_primary_process:
-            print('='*82 + f'\nTraining a Model (Replicate {self.replicate})\n' + '-'*82)
+            print(
+                "=" * 82
+                + f"\nTraining a Model (Replicate {self.replicate})\n"
+                + "-" * 82
+            )
             print(self.desc.display)
-            print(f'Output Location: {self.desc.run_path(self.replicate)}' + '\n' + '='*82 + '\n')
+            print(
+                f"Output Location: {self.desc.run_path(self.replicate)}"
+                + "\n"
+                + "=" * 82
+                + "\n"
+            )
         self.desc.save(self.desc.run_path(self.replicate))
         train.standard_train(
-            models.registry.get(self.desc.model_hparams), self.desc.run_path(self.replicate),
-            self.desc.dataset_hparams, self.desc.training_hparams, evaluate_every_epoch=self.evaluate_every_epoch)
+            models.registry.get(self.desc.model_hparams),
+            self.desc.run_path(self.replicate),
+            self.desc.dataset_hparams,
+            self.desc.training_hparams,
+            evaluate_every_epoch=self.evaluate_every_epoch,
+        )

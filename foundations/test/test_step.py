@@ -50,57 +50,61 @@ class TestStep(test_case.TestCase):
         self.assertStepEquals(Step.from_epoch(100, 1000, 100), 11000, 110, 0)
 
     def test_from_str(self):
-        self.assertStepEquals(Step.from_str('0it', 100), 0, 0, 0)
-        self.assertStepEquals(Step.from_str('0ep', 100), 0, 0, 0)
-        self.assertStepEquals(Step.from_str('0ep0it', 100), 0, 0, 0)
+        self.assertStepEquals(Step.from_str("0it", 100), 0, 0, 0)
+        self.assertStepEquals(Step.from_str("0ep", 100), 0, 0, 0)
+        self.assertStepEquals(Step.from_str("0ep0it", 100), 0, 0, 0)
 
-        self.assertStepEquals(Step.from_str('50it', 100), 50, 0, 50)
-        self.assertStepEquals(Step.from_str('100it', 100), 100, 1, 0)
-        self.assertStepEquals(Step.from_str('2021it', 100), 2021, 20, 21)
+        self.assertStepEquals(Step.from_str("50it", 100), 50, 0, 50)
+        self.assertStepEquals(Step.from_str("100it", 100), 100, 1, 0)
+        self.assertStepEquals(Step.from_str("2021it", 100), 2021, 20, 21)
 
-        self.assertStepEquals(Step.from_str('5ep', 100), 500, 5, 0)
-        self.assertStepEquals(Step.from_str('20ep', 100), 2000, 20, 0)
+        self.assertStepEquals(Step.from_str("5ep", 100), 500, 5, 0)
+        self.assertStepEquals(Step.from_str("20ep", 100), 2000, 20, 0)
 
-        self.assertStepEquals(Step.from_str('5ep3it', 100), 503, 5, 3)
-
-        with self.assertRaises(ValueError):
-            Step.from_str('', 100)
+        self.assertStepEquals(Step.from_str("5ep3it", 100), 503, 5, 3)
 
         with self.assertRaises(ValueError):
-            Step.from_str('0', 100)
+            Step.from_str("", 100)
 
         with self.assertRaises(ValueError):
-            Step.from_str('it', 100)
+            Step.from_str("0", 100)
 
         with self.assertRaises(ValueError):
-            Step.from_str('ep', 100)
+            Step.from_str("it", 100)
 
         with self.assertRaises(ValueError):
-            Step.from_str('ep0', 100)
+            Step.from_str("ep", 100)
 
         with self.assertRaises(ValueError):
-            Step.from_str('20it50ep', 100)
+            Step.from_str("ep0", 100)
+
+        with self.assertRaises(ValueError):
+            Step.from_str("20it50ep", 100)
 
     def test_zero(self):
         self.assertStepEquals(Step.zero(100), 0, 0, 0)
 
     def test_equal(self):
-        self.assertEqual(Step.from_str('100it', 100), Step.from_str('100it', 100))
-        self.assertNotEqual(Step.from_str('101it', 100), Step.from_str('100it', 100))
-        self.assertEqual(Step.from_str('1ep', 100), Step.from_str('100it', 100))
-        self.assertEqual(Step.from_str('5ep6it', 100), Step.from_str('506it', 100))
+        self.assertEqual(Step.from_str("100it", 100), Step.from_str("100it", 100))
+        self.assertNotEqual(Step.from_str("101it", 100), Step.from_str("100it", 100))
+        self.assertEqual(Step.from_str("1ep", 100), Step.from_str("100it", 100))
+        self.assertEqual(Step.from_str("5ep6it", 100), Step.from_str("506it", 100))
 
         with self.assertRaises(ValueError):
-            Step.from_str('100it', 101) == Step.from_str('100it', 100)
+            Step.from_str("100it", 101) == Step.from_str("100it", 100)
 
     def test_comparisons(self):
-        self.assertLessEqual(Step.from_str('100it', 100), Step.from_str('100it', 100))
-        self.assertLess(Step.from_str('100it', 100), Step.from_str('101it', 100))
-        self.assertLessEqual(Step.from_str('100it', 100), Step.from_str('101it', 100))
+        self.assertLessEqual(Step.from_str("100it", 100), Step.from_str("100it", 100))
+        self.assertLess(Step.from_str("100it", 100), Step.from_str("101it", 100))
+        self.assertLessEqual(Step.from_str("100it", 100), Step.from_str("101it", 100))
 
-        self.assertGreaterEqual(Step.from_str('100it', 100), Step.from_str('100it', 100))
-        self.assertGreater(Step.from_str('102it', 100), Step.from_str('101it', 100))
-        self.assertGreaterEqual(Step.from_str('102it', 100), Step.from_str('101it', 100))
+        self.assertGreaterEqual(
+            Step.from_str("100it", 100), Step.from_str("100it", 100)
+        )
+        self.assertGreater(Step.from_str("102it", 100), Step.from_str("101it", 100))
+        self.assertGreaterEqual(
+            Step.from_str("102it", 100), Step.from_str("101it", 100)
+        )
 
 
 test_case.main()

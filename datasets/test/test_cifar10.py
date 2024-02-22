@@ -29,19 +29,25 @@ class TestDataset(test_case.TestCase):
     def test_randomize_labels_half(self):
         labels_before = self.test_set._labels.tolist()
         self.test_set.randomize_labels(0, 0.5)
-        examples_match = np.sum(np.equal(labels_before, self.test_set._labels).astype(int))
+        examples_match = np.sum(
+            np.equal(labels_before, self.test_set._labels).astype(int)
+        )
         self.assertEqual(examples_match, 5503)
 
     def test_randomize_labels_none(self):
         labels_before = self.test_set._labels.tolist()
         self.test_set.randomize_labels(0, 0)
-        examples_match = np.sum(np.equal(labels_before, self.test_set._labels).astype(int))
+        examples_match = np.sum(
+            np.equal(labels_before, self.test_set._labels).astype(int)
+        )
         self.assertEqual(examples_match, 10000)
 
     def test_randomize_labels_all(self):
         labels_before = self.test_set._labels.tolist()
         self.test_set.randomize_labels(0, 1)
-        examples_match = np.sum(np.equal(labels_before, self.test_set._labels).astype(int))
+        examples_match = np.sum(
+            np.equal(labels_before, self.test_set._labels).astype(int)
+        )
         self.assertEqual(examples_match, 1020)
 
     def test_subsample(self):
@@ -52,14 +58,18 @@ class TestDataset(test_case.TestCase):
         self.assertEqual(self.test_set._labels[:10].tolist(), labels_test)
         self.test_set.subsample(0, 0.1)
         self.assertEqual(len(self.test_set), 1000)
-        self.assertEqual(self.test_set._labels[:10].tolist(), subsampled_labels_with_seed_zero_test)
+        self.assertEqual(
+            self.test_set._labels[:10].tolist(), subsampled_labels_with_seed_zero_test
+        )
 
         # Evaluate with a different seed.
         subsampled_labels_with_seed_one_test = [1, 6, 4, 7, 9, 1, 7, 2, 8, 5]
         self.test_set = cifar10.Dataset.get_test_set()
         self.test_set.subsample(1, 0.1)
         self.assertEqual(len(self.test_set), 1000)
-        self.assertEqual(self.test_set._labels[:10].tolist(), subsampled_labels_with_seed_one_test)
+        self.assertEqual(
+            self.test_set._labels[:10].tolist(), subsampled_labels_with_seed_one_test
+        )
 
         # Subsample the train set.
         labels_train = [6, 9, 9, 4, 1, 1, 2, 7, 8, 3]
@@ -68,14 +78,18 @@ class TestDataset(test_case.TestCase):
         self.assertEqual(self.train_set._labels[:10].tolist(), labels_train)
         self.train_set.subsample(0, 0.1)
         self.assertEqual(len(self.train_set), 5000)
-        self.assertEqual(self.train_set._labels[:10].tolist(), subsampled_labels_with_seed_zero_train)
+        self.assertEqual(
+            self.train_set._labels[:10].tolist(), subsampled_labels_with_seed_zero_train
+        )
 
         # Evaluate with a different seed.
         subsampled_labels_with_seed_one_train = [2, 1, 4, 2, 5, 6, 4, 3, 8, 2]
         self.train_set = cifar10.Dataset.get_train_set(use_augmentation=True)
         self.train_set.subsample(1, 0.1)
         self.assertEqual(len(self.train_set), 5000)
-        self.assertEqual(self.train_set._labels[:10].tolist(), subsampled_labels_with_seed_one_train)
+        self.assertEqual(
+            self.train_set._labels[:10].tolist(), subsampled_labels_with_seed_one_train
+        )
 
     def test_subsample_twice(self):
         self.train_set.subsample(1, 0.1)

@@ -12,23 +12,32 @@ import numpy as np
 class PrunedModel(Model):
     @staticmethod
     def to_mask_name(name):
-        return 'mask_' + name.replace('.', '___')
+        return "mask_" + name.replace(".", "___")
 
     def __init__(self, model: Model, mask: Mask):
-        if isinstance(model, PrunedModel): raise ValueError('Cannot nest pruned models.')
+        if isinstance(model, PrunedModel):
+            raise ValueError("Cannot nest pruned models.")
         super(PrunedModel, self).__init__()
         self.model = model
 
         for k in self.model.prunable_layer_names:
-            if k not in mask: raise ValueError('Missing mask value {}.'.format(k))
-            if not np.array_equal(mask[k].shape, np.array(self.model.state_dict()[k].shape)):
-                raise ValueError('Incorrect mask shape {} for tensor {}.'.format(mask[k].shape, k))
+            if k not in mask:
+                raise ValueError("Missing mask value {}.".format(k))
+            if not np.array_equal(
+                mask[k].shape, np.array(self.model.state_dict()[k].shape)
+            ):
+                raise ValueError(
+                    "Incorrect mask shape {} for tensor {}.".format(mask[k].shape, k)
+                )
 
         for k in mask:
             if k not in self.model.prunable_layer_names:
-                raise ValueError('Key {} found in mask but is not a valid model tensor.'.format(k))
+                raise ValueError(
+                    "Key {} found in mask but is not a valid model tensor.".format(k)
+                )
 
-        for k, v in mask.items(): self.register_buffer(PrunedModel.to_mask_name(k), v.float())
+        for k, v in mask.items():
+            self.register_buffer(PrunedModel.to_mask_name(k), v.float())
         self._apply_mask()
 
     def _apply_mask(self):
@@ -56,8 +65,13 @@ class PrunedModel(Model):
         self.model.save(save_location, save_step)
 
     @staticmethod
-    def default_hparams(): raise NotImplementedError()
+    def default_hparams():
+        raise NotImplementedError()
+
     @staticmethod
-    def is_valid_model_name(model_name): raise NotImplementedError()
+    def is_valid_model_name(model_name):
+        raise NotImplementedError()
+
     @staticmethod
-    def get_model_from_name(model_name, outputs, initializer): raise NotImplementedError()
+    def get_model_from_name(model_name, outputs, initializer):
+        raise NotImplementedError()

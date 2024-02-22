@@ -8,12 +8,12 @@ import argparse
 
 def maybe_get_arg(arg_name, positional=False, position=0, boolean_arg=False):
     parser = argparse.ArgumentParser(add_help=False)
-    prefix = '' if positional else '--'
+    prefix = "" if positional else "--"
     if positional:
         for i in range(position):
-            parser.add_argument(f'arg{i}')
+            parser.add_argument(f"arg{i}")
     if boolean_arg:
-        parser.add_argument(prefix + arg_name, action='store_true')
+        parser.add_argument(prefix + arg_name, action="store_true")
     else:
         parser.add_argument(prefix + arg_name, type=str, default=None)
     try:

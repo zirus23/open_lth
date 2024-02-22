@@ -14,9 +14,11 @@ from testing import test_case
 class TestSparseGlobal(test_case.TestCase):
     def setUp(self):
         super(TestSparseGlobal, self).setUp()
-        self.hparams = PruningHparams('sparse_global', 0.2)
+        self.hparams = PruningHparams("sparse_global", 0.2)
 
-        model_hparams = models.registry.get_default_hparams('cifar_resnet_20').model_hparams
+        model_hparams = models.registry.get_default_hparams(
+            "cifar_resnet_20"
+        ).model_hparams
         self.model = models.registry.get(model_hparams)
 
     def test_get_pruning_hparams(self):
@@ -65,7 +67,7 @@ class TestSparseGlobal(test_case.TestCase):
 
     def test_prune_layers_to_ignore(self):
         layers_to_ignore = sorted(self.model.prunable_layer_names)[:5]
-        self.hparams.pruning_layers_to_ignore = ','.join(layers_to_ignore)
+        self.hparams.pruning_layers_to_ignore = ",".join(layers_to_ignore)
 
         m = Strategy.prune(self.hparams, self.model).numpy()
 

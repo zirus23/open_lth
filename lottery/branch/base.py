@@ -68,7 +68,9 @@ class Branch(Runner):
     def branch_root(self) -> str:
         """The root for where branch results will be stored for a specific invocation of run()."""
 
-        return self.lottery_desc.run_path(self.replicate, self.level, self.experiment_name)
+        return self.lottery_desc.run_path(
+            self.replicate, self.level, self.experiment_name
+        )
 
     @property
     def level_root(self) -> str:
@@ -82,12 +84,15 @@ class Branch(Runner):
         levels: str
         pretrain_training_steps: str = None
 
-        _name: str = 'Lottery Ticket Hyperparameters'
-        _description: str = 'Hyperparameters that control the lottery ticket process.'
-        _levels: str = \
-            'The pruning levels on which to run this branch. Can include a comma-separate list of levels or ranges, '\
-            'e.g., 1,2-4,9'
-        _pretrain_training_steps: str = 'The number of steps to train the network prior to the lottery ticket process.'
+        _name: str = "Lottery Ticket Hyperparameters"
+        _description: str = "Hyperparameters that control the lottery ticket process."
+        _levels: str = (
+            "The pruning levels on which to run this branch. Can include a comma-separate list of levels or ranges, "
+            "e.g., 1,2-4,9"
+        )
+        _pretrain_training_steps: str = (
+            "The number of steps to train the network prior to the lottery ticket process."
+        )
 
     @classmethod
     def add_args(cls, parser: argparse.ArgumentParser):
@@ -99,23 +104,37 @@ class Branch(Runner):
     @staticmethod
     def level_str_to_int_list(levels: str):
         level_list = []
-        elements = levels.split(',')
+        elements = levels.split(",")
         for element in elements:
             if element.isdigit():
                 level_list.append(int(element))
-            elif len(element.split('-')) == 2:
-                level_list += list(range(int(element.split('-')[0]), int(element.split('-')[1]) + 1))
+            elif len(element.split("-")) == 2:
+                level_list += list(
+                    range(int(element.split("-")[0]), int(element.split("-")[1]) + 1)
+                )
             else:
-                raise ValueError(f'Invalid level: {element}')
+                raise ValueError(f"Invalid level: {element}")
         return sorted(list(set(level_list)))
 
     @classmethod
     def create_from_args(cls, args: argparse.Namespace):
         levels = Branch.level_str_to_int_list(args.levels)
-        return cls(args.replicate, levels, cls.BranchDesc.create_from_args(args), not args.quiet)
+        return cls(
+            args.replicate,
+            levels,
+            cls.BranchDesc.create_from_args(args),
+            not args.quiet,
+        )
 
     @classmethod
-    def create_from_hparams(cls, replicate, levels: List[int], desc: LotteryDesc, hparams: Hparams, verbose=False):
+    def create_from_hparams(
+        cls,
+        replicate,
+        levels: List[int],
+        desc: LotteryDesc,
+        hparams: Hparams,
+        verbose=False,
+    ):
         return cls(replicate, levels, cls.BranchDesc(desc, hparams), verbose)
 
     def display_output_location(self):
@@ -124,13 +143,21 @@ class Branch(Runner):
     def run(self):
         for self.level in self.levels:
             if self.verbose and get_platform().is_primary_process:
-                print('='*82)
-                print(f'Branch {self.name()} (Replicate {self.replicate}, Level {self.level})\n' + '-'*82)
-                print(f'{self.lottery_desc.display}\n{self.desc.branch_hparams.display}')
-                print(f'Output Location: {self.branch_root}\n' + '='*82 + '\n')
+                print("=" * 82)
+                print(
+                    f"Branch {self.name()} (Replicate {self.replicate}, Level {self.level})\n"
+                    + "-" * 82
+                )
+                print(
+                    f"{self.lottery_desc.display}\n{self.desc.branch_hparams.display}"
+                )
+                print(f"Output Location: {self.branch_root}\n" + "=" * 82 + "\n")
 
-            args = {f.name: getattr(self.desc.branch_hparams, f.name)
-                    for f in fields(self.BranchHparams) if not f.name.startswith('_')}
+            args = {
+                f.name: getattr(self.desc.branch_hparams, f.name)
+                for f in fields(self.BranchHparams)
+                if not f.name.startswith("_")
+            }
             self.branch_function(**args)
 
     # Initialize instances and subclasses (metaprogramming).
@@ -143,15 +170,29 @@ class Branch(Runner):
         """
 
         fields = []
-        for arg_name, parameter in list(inspect.signature(cls.branch_function).parameters.items())[1:]:
+        for arg_name, parameter in list(
+            inspect.signature(cls.branch_function).parameters.items()
+        )[1:]:
             t = parameter.annotation
-            if t == inspect._empty: raise ValueError(f'Argument {arg_name} needs a type annotation.')
-            elif t in [str, float, int, bool] or (isinstance(t, type) and issubclass(t, Hparams)):
-                if parameter.default != inspect._empty: fields.append((arg_name, t, field(default=parameter.default)))
-                else: fields.append((arg_name, t))
+            if t == inspect._empty:
+                raise ValueError(f"Argument {arg_name} needs a type annotation.")
+            elif t in [str, float, int, bool] or (
+                isinstance(t, type) and issubclass(t, Hparams)
+            ):
+                if parameter.default != inspect._empty:
+                    fields.append((arg_name, t, field(default=parameter.default)))
+                else:
+                    fields.append((arg_name, t))
             else:
-                raise ValueError('Invalid branch type: {}'.format(parameter.annotation))
+                raise ValueError("Invalid branch type: {}".format(parameter.annotation))
 
-        fields += [('_name', str, 'Branch Arguments'), ('_description', str, 'Arguments specific to the branch.')]
-        setattr(cls, 'BranchHparams', make_dataclass('BranchHparams', fields, bases=(Hparams,)))
-        setattr(cls, 'BranchDesc', make_BranchDesc(cls.BranchHparams, cls.name()))
+        fields += [
+            ("_name", str, "Branch Arguments"),
+            ("_description", str, "Arguments specific to the branch."),
+        ]
+        setattr(
+            cls,
+            "BranchHparams",
+            make_dataclass("BranchHparams", fields, bases=(Hparams,)),
+        )
+        setattr(cls, "BranchDesc", make_BranchDesc(cls.BranchHparams, cls.name()))

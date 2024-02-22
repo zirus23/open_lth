@@ -19,7 +19,7 @@ from training.metric_logger import MetricLogger
 class TestCheckpointing(test_case.TestCase):
     def test_create_restore_delete(self):
         # Create the hyperparameters and objects to save.
-        hp = models.registry.get_default_hparams('cifar_resnet_20')
+        hp = models.registry.get_default_hparams("cifar_resnet_20")
         model = models.registry.get(hp.model_hparams)
         optimizer = optimizers.get_optimizer(hp.training_hparams, model)
         dataloader = datasets.registry.get(hp.dataset_hparams)
@@ -34,12 +34,14 @@ class TestCheckpointing(test_case.TestCase):
 
         # Create a fake logger.
         logger = MetricLogger()
-        logger.add('test_accuracy', Step.from_epoch(0, 0, 400), 0.1)
-        logger.add('test_accuracy', Step.from_epoch(10, 0, 400), 0.5)
-        logger.add('test_accuracy', Step.from_epoch(100, 0, 400), 0.8)
+        logger.add("test_accuracy", Step.from_epoch(0, 0, 400), 0.1)
+        logger.add("test_accuracy", Step.from_epoch(10, 0, 400), 0.5)
+        logger.add("test_accuracy", Step.from_epoch(100, 0, 400), 0.8)
 
         # Save a checkpoint.
-        checkpointing.save_checkpoint_callback(self.root, step, model, optimizer, logger)
+        checkpointing.save_checkpoint_callback(
+            self.root, step, model, optimizer, logger
+        )
         self.assertTrue(os.path.exists(paths.checkpoint(self.root)))
 
         # Create new models.
@@ -51,11 +53,17 @@ class TestCheckpointing(test_case.TestCase):
         for k in model.prunable_layer_names:
             self.assertFalse(np.array_equal(sd1[k].numpy(), sd2[k].numpy()))
 
-        self.assertIn('momentum_buffer', optimizer.state[optimizer.param_groups[0]['params'][0]])
-        self.assertNotIn('momentum_buffer', optimizer2.state[optimizer.param_groups[0]['params'][0]])
+        self.assertIn(
+            "momentum_buffer", optimizer.state[optimizer.param_groups[0]["params"][0]]
+        )
+        self.assertNotIn(
+            "momentum_buffer", optimizer2.state[optimizer.param_groups[0]["params"][0]]
+        )
 
         # Restore the checkpointt.
-        step2, logger2 = checkpointing.restore_checkpoint(self.root, model2, optimizer2, 400)
+        step2, logger2 = checkpointing.restore_checkpoint(
+            self.root, model2, optimizer2, 400
+        )
 
         self.assertTrue(os.path.exists(paths.checkpoint(self.root)))
         self.assertEqual(step, step2)
@@ -68,8 +76,12 @@ class TestCheckpointing(test_case.TestCase):
             self.assertTrue(np.array_equal(sd1[k].numpy(), sd2[k].numpy()))
 
         # Ensure the new optimizer is now the same.
-        mom1 = optimizer.state[optimizer.param_groups[0]['params'][0]]['momentum_buffer']
-        mom2 = optimizer2.state[optimizer.param_groups[0]['params'][0]]['momentum_buffer']
+        mom1 = optimizer.state[optimizer.param_groups[0]["params"][0]][
+            "momentum_buffer"
+        ]
+        mom2 = optimizer2.state[optimizer.param_groups[0]["params"][0]][
+            "momentum_buffer"
+        ]
         self.assertTrue(np.array_equal(mom1.numpy(), mom2.numpy()))
 
 

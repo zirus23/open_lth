@@ -21,29 +21,40 @@ class TestStandardCallbacks(test_case.TestCase):
         super(TestStandardCallbacks, self).setUp()
 
         # Model hparams.
-        self.hparams = models.registry.get_default_hparams('mnist_lenet_10_10')
+        self.hparams = models.registry.get_default_hparams("mnist_lenet_10_10")
         self.model = models.registry.get(self.hparams.model_hparams)
 
         # Dataset hparams.
         self.hparams.dataset_hparams.subsample_fraction = 0.01
         self.hparams.dataset_hparams.batch_size = 50
         self.train_loader = datasets.registry.get(self.hparams.dataset_hparams)
-        self.test_loader = datasets.registry.get(self.hparams.dataset_hparams, train=False)
+        self.test_loader = datasets.registry.get(
+            self.hparams.dataset_hparams, train=False
+        )
 
         # Training hparams.
-        self.hparams.training_hparams.training_steps = '3ep'
+        self.hparams.training_hparams.training_steps = "3ep"
 
         # Get the callbacks.
         self.callbacks = standard_callbacks.standard_callbacks(
-            self.hparams.training_hparams, self.train_loader, self.test_loader,
-            eval_on_train=True, verbose=False)
+            self.hparams.training_hparams,
+            self.train_loader,
+            self.test_loader,
+            eval_on_train=True,
+            verbose=False,
+        )
 
     def test_first_step(self):
         init_state = TestStandardCallbacks.get_state(self.model)
 
-        train.train(self.hparams.training_hparams, self.model, self.train_loader,
-                    self.root, callbacks=self.callbacks,
-                    end_step=Step.from_epoch(0, 1, len(self.train_loader)))
+        train.train(
+            self.hparams.training_hparams,
+            self.model,
+            self.train_loader,
+            self.root,
+            callbacks=self.callbacks,
+            end_step=Step.from_epoch(0, 1, len(self.train_loader)),
+        )
 
         # Check that the initial state has been saved.
         model_state_loc = paths.model(self.root, Step.zero(len(self.train_loader)))
@@ -61,10 +72,15 @@ class TestStandardCallbacks(test_case.TestCase):
         self.assertFalse(os.path.exists(paths.logger(self.root)))
 
     def test_last_step(self):
-        train.train(self.hparams.training_hparams, self.model, self.train_loader,
-                    self.root, callbacks=self.callbacks,
-                    start_step=Step.from_epoch(2, 11, len(self.train_loader)),
-                    end_step=Step.from_epoch(3, 0, len(self.train_loader)))
+        train.train(
+            self.hparams.training_hparams,
+            self.model,
+            self.train_loader,
+            self.root,
+            callbacks=self.callbacks,
+            start_step=Step.from_epoch(2, 11, len(self.train_loader)),
+            end_step=Step.from_epoch(3, 0, len(self.train_loader)),
+        )
 
         end_state = TestStandardCallbacks.get_state(self.model)
 
@@ -80,10 +96,10 @@ class TestStandardCallbacks(test_case.TestCase):
         # Check that the logger has the right number of entries.
         self.assertTrue(os.path.exists(paths.logger(self.root)))
         logger = MetricLogger.create_from_file(self.root)
-        self.assertEqual(len(logger.get_data('train_loss')), 1)
-        self.assertEqual(len(logger.get_data('test_loss')), 1)
-        self.assertEqual(len(logger.get_data('train_accuracy')), 1)
-        self.assertEqual(len(logger.get_data('test_accuracy')), 1)
+        self.assertEqual(len(logger.get_data("train_loss")), 1)
+        self.assertEqual(len(logger.get_data("test_loss")), 1)
+        self.assertEqual(len(logger.get_data("train_accuracy")), 1)
+        self.assertEqual(len(logger.get_data("test_accuracy")), 1)
 
         # Check that the checkpoint file exists.
         self.assertTrue(os.path.exists(paths.checkpoint(self.root)))
@@ -94,10 +110,15 @@ class TestStandardCallbacks(test_case.TestCase):
 
         init_state = TestStandardCallbacks.get_state(self.model)
 
-        train.train(self.hparams.training_hparams, self.model, self.train_loader,
-                    self.root, callbacks=self.callbacks,
-                    start_step=Step.from_epoch(0, 0, len(self.train_loader)),
-                    end_step=Step.from_epoch(3, 0, len(self.train_loader)))
+        train.train(
+            self.hparams.training_hparams,
+            self.model,
+            self.train_loader,
+            self.root,
+            callbacks=self.callbacks,
+            start_step=Step.from_epoch(0, 0, len(self.train_loader)),
+            end_step=Step.from_epoch(3, 0, len(self.train_loader)),
+        )
 
         end_state = TestStandardCallbacks.get_state(self.model)
 
@@ -120,10 +141,10 @@ class TestStandardCallbacks(test_case.TestCase):
         # Check that the logger has the right number of entries.
         self.assertTrue(os.path.exists(paths.logger(self.root)))
         logger = MetricLogger.create_from_file(self.root)
-        self.assertEqual(len(logger.get_data('train_loss')), 4)
-        self.assertEqual(len(logger.get_data('test_loss')), 4)
-        self.assertEqual(len(logger.get_data('train_accuracy')), 4)
-        self.assertEqual(len(logger.get_data('test_accuracy')), 4)
+        self.assertEqual(len(logger.get_data("train_loss")), 4)
+        self.assertEqual(len(logger.get_data("test_loss")), 4)
+        self.assertEqual(len(logger.get_data("train_accuracy")), 4)
+        self.assertEqual(len(logger.get_data("test_accuracy")), 4)
 
     def test_checkpointing(self):
         callback_step_count = 0
@@ -133,18 +154,28 @@ class TestStandardCallbacks(test_case.TestCase):
             callback_step_count += 1
 
         # Train to epoch 1, iteration 1.
-        train.train(self.hparams.training_hparams, self.model, self.train_loader,
-                    self.root, callbacks=self.callbacks,
-                    end_step=Step.from_epoch(1, 1, len(self.train_loader)))
+        train.train(
+            self.hparams.training_hparams,
+            self.model,
+            self.train_loader,
+            self.root,
+            callbacks=self.callbacks,
+            end_step=Step.from_epoch(1, 1, len(self.train_loader)),
+        )
 
         # Add a step-counting callback.
         self.callbacks.append(callback)
 
         # Train to epoch 1, iteration 1 again. Checkpointing should ensure we
         # only train for one step.
-        train.train(self.hparams.training_hparams, self.model, self.train_loader,
-                    self.root, callbacks=self.callbacks,
-                    end_step=Step.from_epoch(1, 1, len(self.train_loader)))
+        train.train(
+            self.hparams.training_hparams,
+            self.model,
+            self.train_loader,
+            self.root,
+            callbacks=self.callbacks,
+            end_step=Step.from_epoch(1, 1, len(self.train_loader)),
+        )
 
         self.assertEqual(callback_step_count, 2)
 

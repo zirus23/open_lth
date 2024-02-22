@@ -24,16 +24,23 @@ class TrainingDesc(desc.Desc):
     training_hparams: hparams.TrainingHparams
 
     @staticmethod
-    def name_prefix(): return 'train'
+    def name_prefix():
+        return "train"
 
     @staticmethod
     def add_args(parser: argparse.ArgumentParser, defaults: LotteryDesc = None):
-        hparams.DatasetHparams.add_args(parser, defaults=defaults.dataset_hparams if defaults else None)
-        hparams.ModelHparams.add_args(parser, defaults=defaults.model_hparams if defaults else None)
-        hparams.TrainingHparams.add_args(parser, defaults=defaults.training_hparams if defaults else None)
+        hparams.DatasetHparams.add_args(
+            parser, defaults=defaults.dataset_hparams if defaults else None
+        )
+        hparams.ModelHparams.add_args(
+            parser, defaults=defaults.model_hparams if defaults else None
+        )
+        hparams.TrainingHparams.add_args(
+            parser, defaults=defaults.training_hparams if defaults else None
+        )
 
     @staticmethod
-    def create_from_args(args: argparse.Namespace) -> 'TrainingDesc':
+    def create_from_args(args: argparse.Namespace) -> "TrainingDesc":
         dataset_hparams = hparams.DatasetHparams.create_from_args(args)
         model_hparams = hparams.ModelHparams.create_from_args(args)
         training_hparams = hparams.TrainingHparams.create_from_args(args)
@@ -41,16 +48,26 @@ class TrainingDesc(desc.Desc):
 
     @property
     def end_step(self):
-        iterations_per_epoch = datasets_registry.iterations_per_epoch(self.dataset_hparams)
+        iterations_per_epoch = datasets_registry.iterations_per_epoch(
+            self.dataset_hparams
+        )
         return Step.from_str(self.training_hparams.training_steps, iterations_per_epoch)
 
     @property
     def train_outputs(self):
         datasets_registry.num_classes(self.dataset_hparams)
 
-    def run_path(self, replicate, experiment='main'):
-        return os.path.join(get_platform().root, self.hashname, f'replicate_{replicate}', experiment)
+    def run_path(self, replicate, experiment="main"):
+        return os.path.join(
+            get_platform().root, self.hashname, f"replicate_{replicate}", experiment
+        )
 
     @property
     def display(self):
-        return '\n'.join([self.dataset_hparams.display, self.model_hparams.display, self.training_hparams.display])
+        return "\n".join(
+            [
+                self.dataset_hparams.display,
+                self.model_hparams.display,
+                self.training_hparams.display,
+            ]
+        )

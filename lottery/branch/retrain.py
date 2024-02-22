@@ -18,14 +18,27 @@ class Branch(base.Branch):
         self,
         retrain_d: hparams.DatasetHparams,
         retrain_t: hparams.TrainingHparams,
-        start_at_step_zero: bool = False
+        start_at_step_zero: bool = False,
     ):
         # Get the mask and model.
-        m = models.registry.load(self.level_root, self.lottery_desc.train_start_step, self.lottery_desc.model_hparams)
+        m = models.registry.load(
+            self.level_root,
+            self.lottery_desc.train_start_step,
+            self.lottery_desc.model_hparams,
+        )
         m = PrunedModel(m, Mask.load(self.level_root))
-        start_step = Step.from_iteration(0 if start_at_step_zero else self.lottery_desc.train_start_step.iteration,
-                                         datasets.registry.iterations_per_epoch(retrain_d))
-        train.standard_train(m, self.branch_root, retrain_d, retrain_t, start_step=start_step, verbose=self.verbose)
+        start_step = Step.from_iteration(
+            0 if start_at_step_zero else self.lottery_desc.train_start_step.iteration,
+            datasets.registry.iterations_per_epoch(retrain_d),
+        )
+        train.standard_train(
+            m,
+            self.branch_root,
+            retrain_d,
+            retrain_t,
+            start_step=start_step,
+            verbose=self.verbose,
+        )
 
     @staticmethod
     def description():
@@ -33,4 +46,4 @@ class Branch(base.Branch):
 
     @staticmethod
     def name():
-        return 'retrain'
+        return "retrain"

@@ -28,8 +28,8 @@ class Model(abc.ABC, torch.nn.Module):
     def get_model_from_name(
         model_name: str,
         outputs: int,
-        initializer: typing.Callable[[torch.nn.Module], None]
-    ) -> 'Model':
+        initializer: typing.Callable[[torch.nn.Module], None],
+    ) -> "Model":
         """Returns an instance of this class as described by the model_name string."""
 
         pass
@@ -41,9 +41,12 @@ class Model(abc.ABC, torch.nn.Module):
         By default, only the weights of convolutional and linear layers are prunable.
         """
 
-        return [name + '.weight' for name, module in self.named_modules() if
-                isinstance(module, torch.nn.modules.conv.Conv2d) or
-                isinstance(module, torch.nn.modules.linear.Linear)]
+        return [
+            name + ".weight"
+            for name, module in self.named_modules()
+            if isinstance(module, torch.nn.modules.conv.Conv2d)
+            or isinstance(module, torch.nn.modules.linear.Linear)
+        ]
 
     @property
     @abc.abstractmethod
@@ -54,7 +57,7 @@ class Model(abc.ABC, torch.nn.Module):
 
     @staticmethod
     @abc.abstractmethod
-    def default_hparams() -> 'lottery.desc.LotteryDesc':
+    def default_hparams() -> "lottery.desc.LotteryDesc":
         """The default hyperparameters for training this model and running lottery ticket."""
 
         pass
@@ -67,9 +70,13 @@ class Model(abc.ABC, torch.nn.Module):
         pass
 
     def save(self, save_location: str, save_step: Step):
-        if not get_platform().is_primary_process: return
-        if not get_platform().exists(save_location): get_platform().makedirs(save_location)
-        get_platform().save_model(self.state_dict(), paths.model(save_location, save_step))
+        if not get_platform().is_primary_process:
+            return
+        if not get_platform().exists(save_location):
+            get_platform().makedirs(save_location)
+        get_platform().save_model(
+            self.state_dict(), paths.model(save_location, save_step)
+        )
 
 
 class DataParallel(Model, torch.nn.DataParallel):
@@ -77,22 +84,28 @@ class DataParallel(Model, torch.nn.DataParallel):
         super(DataParallel, self).__init__(module=module)
 
     @property
-    def prunable_layer_names(self): return self.module.prunable_layer_names
+    def prunable_layer_names(self):
+        return self.module.prunable_layer_names
 
     @property
-    def output_layer_names(self): return self.module.output_layer_names
+    def output_layer_names(self):
+        return self.module.output_layer_names
 
     @property
-    def loss_criterion(self): return self.module.loss_criterion
+    def loss_criterion(self):
+        return self.module.loss_criterion
 
     @staticmethod
-    def get_model_from_name(model_name, outputs, initializer): raise NotImplementedError
+    def get_model_from_name(model_name, outputs, initializer):
+        raise NotImplementedError
 
     @staticmethod
-    def is_valid_model_name(model_name): raise NotImplementedError
+    def is_valid_model_name(model_name):
+        raise NotImplementedError
 
     @staticmethod
-    def default_hparams(): raise NotImplementedError
+    def default_hparams():
+        raise NotImplementedError
 
     def save(self, save_location: str, save_step: Step):
         self.module.save(save_location, save_step)
@@ -100,25 +113,33 @@ class DataParallel(Model, torch.nn.DataParallel):
 
 class DistributedDataParallel(Model, torch.nn.parallel.DistributedDataParallel):
     def __init__(self, module: Model, device_ids):
-        super(DistributedDataParallel, self).__init__(module=module, device_ids=device_ids)
+        super(DistributedDataParallel, self).__init__(
+            module=module, device_ids=device_ids
+        )
 
     @property
-    def prunable_layer_names(self): return self.module.prunable_layer_names
+    def prunable_layer_names(self):
+        return self.module.prunable_layer_names
 
     @property
-    def output_layer_names(self): return self.module.output_layer_names
+    def output_layer_names(self):
+        return self.module.output_layer_names
 
     @property
-    def loss_criterion(self): return self.module.loss_criterion
+    def loss_criterion(self):
+        return self.module.loss_criterion
 
     @staticmethod
-    def get_model_from_name(model_name, outputs, initializer): raise NotImplementedError
+    def get_model_from_name(model_name, outputs, initializer):
+        raise NotImplementedError
 
     @staticmethod
-    def is_valid_model_name(model_name): raise NotImplementedError
+    def is_valid_model_name(model_name):
+        raise NotImplementedError
 
     @staticmethod
-    def default_hparams(): raise NotImplementedError
+    def default_hparams():
+        raise NotImplementedError
 
     def save(self, save_location: str, save_step: Step):
         self.module.save(save_location, save_step)

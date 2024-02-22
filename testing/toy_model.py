@@ -10,19 +10,24 @@ from models.base import Model
 
 class InnerProductModel(Model):
     @staticmethod
-    def default_hparams(): raise NotImplementedError
+    def default_hparams():
+        raise NotImplementedError
 
     @staticmethod
-    def is_valid_model_name(model_name): raise NotImplementedError
+    def is_valid_model_name(model_name):
+        raise NotImplementedError
 
     @staticmethod
-    def get_model_from_name(model_name): raise NotImplementedError
+    def get_model_from_name(model_name):
+        raise NotImplementedError
 
     @property
-    def output_layer_names(self): raise NotImplementedError
+    def output_layer_names(self):
+        raise NotImplementedError
 
     @property
-    def loss_criterion(self): return torch.nn.MSELoss()
+    def loss_criterion(self):
+        return torch.nn.MSELoss()
 
     def __init__(self, n):
         super(Model, self).__init__()

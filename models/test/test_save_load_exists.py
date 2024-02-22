@@ -14,7 +14,7 @@ from testing import test_case
 
 class TestSaveLoadExists(test_case.TestCase):
     def test_save_load_exists(self):
-        hp = registry.get_default_hparams('cifar_resnet_20')
+        hp = registry.get_default_hparams("cifar_resnet_20")
         model = registry.get(hp.model_hparams)
         step = Step.from_iteration(27, 17)
         model_location = paths.model(self.root, step)
